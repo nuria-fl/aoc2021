@@ -20,18 +20,15 @@ function solveStep1(input) {
 function solveStep2(input) {
   const data = parseInput(input).map((num) => parseInt(num, 10));
 
-  const sums = [];
-  for (let i = 0; i <= data.length - 3; i++) {
-    sums.push(data[i] + data[i + 1] + data[i + 2]);
-  }
+  const sum3 = (i) => data[i] + data[i + 1] + data[i + 2];
 
   let count = 0;
-  sums.reduce((prev, current) => {
-    if (prev && prev < current) {
+
+  for (let i = 0; i <= data.length - 3; i++) {
+    if (sum3(i) < sum3(i + 1)) {
       count++;
     }
-    return current;
-  });
+  }
 
   return count;
 }
