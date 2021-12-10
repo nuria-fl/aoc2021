@@ -59,7 +59,79 @@ function solveStep1(input) {
   }
 }
 
-function solveStep2(input) {}
+function solveStep2(input) {
+  const data = parseInput(input);
+  const numbers = data[0].split(",").map((num) => parseInt(num, 10));
+  const rest = data.slice(1).filter((row) => !!row);
+  const cards = Array.from({ length: rest.length / 5 }, () => {
+    return {
+      isWinner: false,
+      card: rest.splice(0, 5).map((row) => {
+        return row
+          .split(" ")
+          .filter((num) => !!num)
+          .map((num) => {
+            return {
+              value: parseInt(num),
+              marked: false,
+            };
+          });
+      }),
+    };
+  });
+
+  function checkCard({ isWinner, card }) {
+    if (isWinner) return false;
+
+    for (let i = 0; i < card.length; i++) {
+      let count = 0;
+      for (let j = 0; j < card[i].length; j++) {
+        if (card[i][j].marked) count++;
+      }
+      if (count === 5) return true;
+    }
+
+    for (let j = 0; j < card[0].length; j++) {
+      let count = 0;
+      for (let i = 0; i < card.length; i++) {
+        if (card[i][j].marked) count++;
+      }
+      if (count === 5) return true;
+    }
+
+    return false;
+  }
+
+  function bingoRound(num, card) {
+    for (let i = 0; i < card.length; i++) {
+      for (let j = 0; j < card[i].length; j++) {
+        if (card[i][j].value === num) card[i][j].marked = true;
+      }
+    }
+  }
+
+  const sumUnmarkedNumbers = ({ card }) => {
+    let score = 0;
+    for (let i = 0; i < card.length; i++) {
+      for (let j = 0; j < card[i].length; j++) {
+        if (!card[i][j].marked) score += card[i][j].value;
+      }
+    }
+    return score;
+  };
+
+  let winningResult = 0;
+
+  for (const num of numbers) {
+    cards.forEach(({ card }) => bingoRound(num, card));
+    for (const winner of cards.filter(checkCard)) {
+      winningResult = sumUnmarkedNumbers(winner) * num;
+      winner.isWinner = true;
+    }
+  }
+
+  return winningResult;
+}
 
 module.exports = {
   solveStep1,
